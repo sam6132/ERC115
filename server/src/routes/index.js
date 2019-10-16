@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { web3, Tx } = require("../helper/web3");
 
-const { address, abi } = require("../contract/gold");
+const { address, abi } = require("../contract/erc1155");
 
 router.get("/createAddressWithPrivateKey", (req, res) => {
   web3.eth.accounts.create().then(account => {
@@ -32,7 +32,7 @@ router.get("/getrecipt", (req, res) => {
       clearInterval(getTransaction);
       return res.send({
         status: "success",
-        contract_address: result.contractAddress
+        result
       });
     }
   }, 2000);

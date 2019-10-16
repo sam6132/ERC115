@@ -10,5 +10,6 @@ interface ERC1155Metadata_URI {
         The URI may point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
         @return URI string
     */
-    function uri(uint256 _id) external view returns (string memory);
+    function get_uri(uint256 _id) external view returns (string memory);
+    function set_uri(uint256 _id, string calldata _uri) external ;
 }
