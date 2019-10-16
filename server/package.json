@@ -1,0 +1,17 @@
+{
+  "name": "queenbee",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://sam6132@bitbucket.org/appoets/queenbee_contract.git",
+  "author": "sam joshuva <sam613263@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bignumber.js": "^9.0.0",
+    "cors": "^2.8.5",
+    "ethereumjs-tx": "^2.1.1",
+    "express": "^4.17.1",
+    "helmet": "^3.21.1",
+    "web3": "^1.2.1",
+    "web3-eth-personal": "^1.2.1"
+  }
+}
