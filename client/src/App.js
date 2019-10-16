@@ -73,19 +73,17 @@ function App() {
 
   const handleChange = name => event => {
 
-    let valueIns = {...values};
+    let valueIns = { ...values };
     valueIns[name] = event.target.value;
     updateValues(valueIns);
   };
 
 
   const handleSenderAddress = () => (e) => {
-    console.log(ethereum_address.isAddress(e.target.value));
-    
-    const senderAddressValid = ethereum_address.isAddress(e.target.value);    
-    console.log("s = ", senderAddressValid);
-    
-    let valueIns = {...values};
+
+    const senderAddressValid = ethereum_address.isAddress(e.target.value);
+
+    let valueIns = { ...values };
     valueIns["senderAddress"] = e.target.value;
     valueIns.senderAddressValid = senderAddressValid;
     updateValues(valueIns);
@@ -93,31 +91,29 @@ function App() {
 
   const handleChangeForProperty = name => event => {
 
-    let valueIns = {...values};
+    let valueIns = { ...values };
     valueIns.properties[name] = event.target.value;
     updateValues(valueIns);
   };
 
   const handleChangeForPropertyRarity = name => event => {
 
-    let valueIns = {...values};
+    let valueIns = { ...values };
     valueIns.properties.rarity[name] = event.target.value;
     updateValues(valueIns);
   };
 
   const onChangeHandler = event => {
 
-    console.log(event.target.files[0])
-    let valueIns = {...values};
+    let valueIns = { ...values };
     valueIns.selectedFile = event.target.files[0];
     updateValues(valueIns);
   }
 
-  const updateValues = function(valueIns) {
+  const updateValues = function (valueIns) {
     valueIns.isValid = validateForm(valueIns);
-    console.log(valueIns);
-    
-    setValues({...valueIns});
+
+    setValues({ ...valueIns });
   }
 
   const validateForm = function (valueIns) {
@@ -126,32 +122,22 @@ function App() {
   }
 
   const createToken = () => (e) => {
-    console.log("create token");
-    console.log(values);
     setValues({ ...values, isInProgress: true });
-    // const senderAddress = prompt("Sender Address: ", "");
-    // if (!senderAddress) {
-    //   alert('Need Sender Address ...!');
-    //   return;
-    // }
-    // const senderPassword = prompt("Sender Password:", "");
-    // if (!senderPassword) {
-    //   alert('Need Sender password ...!');
-    //   return;
-    // }
-    const jsonGenerator = JSON.parse(JSON.stringify(values));
+    const jsonGenerator = { ...values };
     delete jsonGenerator["isValid"];
     delete jsonGenerator["transactionHash"];
     delete jsonGenerator["uri"];
+    delete jsonGenerator["selectedFile"];
     // const reqBody = {
     //   jsonGenerator,
     //   senderAddress, senderPassword
     // }
 
+
     let reqBody = new FormData();
-    reqBody.append('image', values.selectedFile);
     reqBody.append('jsonGenerator', JSON.stringify(jsonGenerator));
     reqBody.append('senderAddress', values.senderAddress);
+    reqBody.append('image', values.selectedFile);
     // reqBody.append('senderPassword', senderPassword);
     const url = baseURL + "api/erc1155/create";
     axios.post(url, reqBody).then(function (successResp) {
@@ -162,8 +148,25 @@ function App() {
       }
       const transactionHash = successResp.data.txHash;
       const uri = successResp.data.uri;
+      const resetData = {
+        image: '',
+        name: '',
+        description: '',
+        properties: {
+          "Origin": "",
+          "Special Ability": "",
+          "rarity": {
+            "name": "",
+            "value": "",
+            "display_value": ""
+          }
+        },
+        senderAddress: '',
+        senderAddressValid: false,
+        selectedFile: null
+      }
       setValues({
-        ...values, transactionHash, uri
+        ...values, transactionHash, uri, ...resetData
       });
       window.open("https://ropsten.etherscan.io/tx/" + transactionHash, '_blank');
 
@@ -287,7 +290,7 @@ function App() {
             />
           </div>
 
-          <div style={{paddingLeft: "10px", marginTop: "10px", marginBottom: "10px"}}>
+          <div style={{ paddingLeft: "10px", marginTop: "10px", marginBottom: "10px" }}>
             <input type="file" name="file" onChange={onChangeHandler} />
           </div>
 
