@@ -57,7 +57,8 @@ function App() {
     },
     isValid: false,
     transactionHash: '',
-    uri: ''
+    uri: '',
+    selectedFile: null
   });
 
   const handleChange = name => event => {
@@ -87,8 +88,15 @@ function App() {
     });
   };
 
+  const onChangeHandler = event => {
+
+    console.log(event.target.files[0])
+    setValues({...values, selectedFile: event.target.files[0]})
+
+  }
+
   const validateForm = function () {
-    return values.image && values.name && values.description && values.properties["Origin"]
+    return values.name && values.description && values.properties["Origin"]
       && values.properties["Special Ability"] && values.properties["rarity"]["name"] && values.properties["rarity"]["display_value"] && values.properties["rarity"]["value"];
   }
 
@@ -105,14 +113,20 @@ function App() {
       alert('Need Sender password ...!');
       return;
     }
-    const jsonGenerate = JSON.parse(JSON.stringify(values));
-    delete jsonGenerate["isValid"];
-    delete jsonGenerate["transactionHash"];
-    delete jsonGenerate["uri"];
-    const reqBody = {
-      jsonGenerator: { json_source: JSON.stringify(jsonGenerate), json_string: JSON.stringify(jsonGenerate) },
-      senderAddress, senderPassword
-    }
+    const jsonGenerator = JSON.parse(JSON.stringify(values));
+    delete jsonGenerator["isValid"];
+    delete jsonGenerator["transactionHash"];
+    delete jsonGenerator["uri"];
+    // const reqBody = {
+    //   jsonGenerator,
+    //   senderAddress, senderPassword
+    // }
+
+    let reqBody = new FormData();
+    reqBody.append('image', values.selectedFile);
+    reqBody.append('jsonGenerator', JSON.stringify(jsonGenerator));
+    reqBody.append('senderAddress', senderAddress);
+    reqBody.append('senderPassword', senderPassword);
     const url = baseURL + "api/erc1155/create";
     axios.post(url, reqBody).then(function (successResp) {
       console.log("successResp = ", successResp);
@@ -134,19 +148,6 @@ function App() {
       <h1 style={{ textAlign: "center" }}>ERC115</h1>
       <Paper className={classes.root}>
         <form noValidate autoComplete="off">
-          <div>
-            <TextField
-              required
-              id="description-input-image"
-              label="Image"
-              className={classes.textField}
-              value={values.image}
-              onChange={handleChange('image')}
-              margin="normal"
-              variant="outlined"
-            />
-          </div>
-
           <div>
             <TextField
               required
@@ -242,6 +243,10 @@ function App() {
           </div>
 
           <div>
+            <input type="file" name="file" onChange={onChangeHandler} />
+          </div>
+
+          <div>
             <Button disabled={!values.isValid} variant="contained" color="primary" className={classes.button} onClick={createToken()}>
               Create Token
           </Button>
@@ -251,9 +256,9 @@ function App() {
         {
           (!values.transactionHash || !values.uri) ? null :
             <div>
-              <br/>
+              <br />
               <a href={values.uri} target="_blank">Click here to view character info</a>
-              <br/>
+              <br />
               <div style={{ color: "red", fontSize: "16px" }}>Transaction Hash: {values.transactionHash}</div>
             </div>
 
