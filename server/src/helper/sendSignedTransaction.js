@@ -2,8 +2,10 @@ const { web3, Tx, personal } = require("./web3");
 
 async function sendSignedTransactionsForContracts(
   data,
+  contract_address,
   senderAddress,
-  senderPrivateKey
+  senderPrivateKey,
+  res
 ) {
   let txObject = {};
   let nonce = null;
@@ -18,8 +20,11 @@ async function sendSignedTransactionsForContracts(
         gasPrice = result[1];
         gasPrice = (parseInt(gasPrice) + parseInt(gasPrice / 2)).toString();
         txObject = {
-          from: senderAddress,
           nonce: web3.utils.toHex(nonce),
+          data: data,
+          from: senderAddress,
+          to: contract_address,
+          gas: 2000000,
           data: data
         };
         // console.log(txObject)
@@ -29,7 +34,7 @@ async function sendSignedTransactionsForContracts(
         // console.log(estimateGas)
         txObject.gasPrice = web3.utils.toHex(gasPrice);
         txObject.gas = web3.utils.toHex(estimateGas);
-        const tx = new Tx(txObject);
+        const tx = new Tx.Transaction(txObject, { chain: "ropsten" });
         const privateKey = Buffer.from(senderPrivateKey, "hex");
         tx.sign(privateKey);
         const serializedTx = tx.serialize();
@@ -40,28 +45,13 @@ async function sendSignedTransactionsForContracts(
             reject(err);
             return;
           }
-          console.log("err:", err, "txHash:", txHash);
+          resolve(txHash);
           // Use this txHash to find the contract on Etherscan!
-          let getTransaction = setInterval(async () => {
-            web3.eth.getTransactionReceipt(txHash, async function(
-              error,
-              result
-            ) {
-              if (error) {
-                clearInterval(getTransaction);
-                console.log({ errrr: error });
-                reject(error);
-              }
 
-              if (result) {
-                clearInterval(getTransaction);
-                // console.log("Transaction result ....", result)
-
-                // console.log({ "address": result.contractAddress + '', "transaction_hash": txHash + '' })
-                resolve(result.contractAddress);
-              }
-            });
-          }, 600);
+          // res.send({
+          //   status: "success",
+          //   txHash
+          // });
         });
       });
   });
@@ -100,9 +90,13 @@ async function sendSignedTransactionsForMethods(
         console.log(unlocked);
         return web3.eth.personal.sendTransaction(tx, senderPassword);
       })
-      .then(transactionHash => {
+      .then(txHash => {
         debugger;
-        return res.json({ transaction: transactionHash });
+
+        res.send({
+          status: "success",
+          txHash
+        });
       })
       .catch(err => {
         debugger;
