@@ -10,7 +10,7 @@ import Button from '@material-ui/core/Button';
 import axios from 'axios';
 
 
-const baseURL = "http://192.168.1.81:5000/";
+const baseURL = "/";
 const useStyles = makeStyles(theme => ({
   container: {
     display: 'flex',
