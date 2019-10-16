@@ -12,8 +12,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 var ethereum_address = require('ethereum-address');
 
-const baseURL = "http://192.168.1.81:5000/";
-// const baseURL = "/";
+// const baseURL = "http://192.168.1.81:5000/";
+const baseURL = "/";
 const useStyles = makeStyles(theme => ({
   container: {
     display: 'flex',
